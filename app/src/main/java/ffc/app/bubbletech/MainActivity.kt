@@ -22,10 +22,10 @@ class MainActivity : ComponentActivity() {
 
         super.onCreate(savedInstanceState)
 
-        val appReady = false
-        splashScreen.setKeepOnScreenCondition{
-            !appReady
-        }
+        //val appReady = false
+        //splashScreen.setKeepOnScreenCondition{
+          //  !appReady
+        //}
 
         enableEdgeToEdge()
         setContent {
