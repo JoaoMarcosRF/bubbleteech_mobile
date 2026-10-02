@@ -1,5 +1,6 @@
 package ffc.app.bubbletech
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -12,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import ffc.app.bubbletech.navigation.AppNavigation
 import ffc.app.bubbletech.ui.theme.BubbleTechTheme
 
 class MainActivity : ComponentActivity() {
@@ -20,8 +22,7 @@ class MainActivity : ComponentActivity() {
 
         super.onCreate(savedInstanceState)
 
-        var appReady = false
-
+        val appReady = false
         splashScreen.setKeepOnScreenCondition{
             !appReady
         }
@@ -29,29 +30,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             BubbleTechTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                AppNavigation()
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    BubbleTechTheme {
-        Greeting("Android")
     }
 }
