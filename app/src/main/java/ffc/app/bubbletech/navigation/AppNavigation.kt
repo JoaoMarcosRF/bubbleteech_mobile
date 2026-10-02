@@ -8,5 +8,22 @@ fun AppNavigation() {
 
     val navController = rememberNavController()
 
+    NavHost(
+        navController = navController,
+        startDestination = "login"
+    ) {
 
+        composable("login"){
+            LoginScreen(
+                onLogin = {
+                    navController.navigate("home") {
+
+                        popUpTo("login") {
+                            inclusive = true
+                        }
+                    }
+                }
+            )
+        }
+    }
 }
