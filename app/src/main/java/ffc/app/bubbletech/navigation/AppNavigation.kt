@@ -77,6 +77,11 @@ fun SplashScreen(navController: NavController) {
 
         delay(1500.milliseconds)
 
+        opacity.animateTo(
+            targetValue = 0f,
+            animationSpec = tween(durationMillis = 700)
+        )
+
         navController.navigate("login") {
             popUpTo("splash_screen") {
                 inclusive = true

@@ -98,7 +98,7 @@ fun LoginScreen(
             enter = slideInVertically(
                 initialOffsetY = { height -> -height },
                 animationSpec = tween(
-                    durationMillis = 1200,
+                    durationMillis = 1400,
                     easing = FastOutSlowInEasing
                 )
             )
