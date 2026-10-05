@@ -23,34 +23,41 @@ import androidx.navigation.compose.rememberNavController
 import ffc.app.bubbletech.R
 
 import ffc.app.bubbletech.screens.LoginScreen
+import ffc.app.bubbletech.ui.theme.BackgroundBlue
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun AppNavigation() {
-
     val navController = rememberNavController()
 
-    NavHost(
-        navController = navController,
-        startDestination = "splash_screen"
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .fillMaxSize()
+            .background(BackgroundBlue)
     ) {
+        NavHost(
+            navController = navController,
+            startDestination = "splash_screen"
+        ) {
 
-        composable("splash_screen") {
-            SplashScreen(navController = navController)
-        }
+            composable("splash_screen") {
+                SplashScreen(navController = navController)
+            }
 
-        composable("login"){
-            LoginScreen(
-                onLogin = {
-                    navController.navigate("home") {
+            composable("login"){
+                LoginScreen(
+                    onLogin = {
+                        navController.navigate("home") {
 
-                        popUpTo("login") {
-                            inclusive = true
+                            popUpTo("login") {
+                                inclusive = true
+                            }
                         }
                     }
-                }
-            )
+                )
+            }
         }
     }
 }
