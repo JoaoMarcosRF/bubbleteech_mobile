@@ -9,6 +9,8 @@ val Pink80 = Color(0xFFEFB8C8)
 val BackgroundBlue = Color(0xFF00174E)
 val SecondaryBlue  = Color(0xFF0033A0)
 
+val CardBlue = Color(0xFF001445)
+
 val LightBlue = Color(0xFF3B82F6)
 val GrayBackground = Color(0XFFF4F5F7)
 
