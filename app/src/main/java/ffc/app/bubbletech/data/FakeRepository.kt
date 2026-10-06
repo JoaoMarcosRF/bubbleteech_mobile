@@ -10,7 +10,7 @@ class FakeRepository {
             Post(
                 id = 1,
                 title = "Anthropic lança versão do Opus 6.0",
-                category = "AI",
+                category = "IA",
                 news = listOf(
                     News(
                         headline = "Nova versão do Opus chega no mercado",
@@ -56,7 +56,7 @@ class FakeRepository {
             Post(
                 id = 3,
                 title = "Kotlin 2.4 é lançado",
-                category = "Development",
+                category = "Desenvolvimento",
                 news = listOf(
                     News(
                         headline = "JetBrains anuncia Kotlin 2.4",
@@ -79,7 +79,7 @@ class FakeRepository {
             Post(
                 id = 4,
                 title = "Startup brasileira de dados recebe aporte milionário",
-                category = "Market",
+                category = "Mercado",
                 news = listOf(
                     News(
                         headline = "Startup de dados capta R$ 50 milhões",

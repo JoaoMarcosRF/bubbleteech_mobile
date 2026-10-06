@@ -22,6 +22,13 @@ import ffc.app.bubbletech.ui.theme.BubbleTechTheme
 fun HomeScreen(posts: List<Post>) {
     var selectedCategory by remember { mutableStateOf("Hot") }
 
+    // "Hot" mostra todos os posts; as outras categorias filtram a lista
+    val visiblePosts = if (selectedCategory == "Hot") {
+        posts
+    } else {
+        posts.filter { post -> post.category == selectedCategory }
+    }
+
     Scaffold(
         containerColor = BackgroundBlue,
         topBar = {
@@ -36,7 +43,7 @@ fun HomeScreen(posts: List<Post>) {
             modifier = Modifier.fillMaxSize(),
             contentPadding = innerPadding
         ) {
-            items(posts) { post ->
+            items(visiblePosts) { post ->
                 PostCard(post = post)
             }
         }
