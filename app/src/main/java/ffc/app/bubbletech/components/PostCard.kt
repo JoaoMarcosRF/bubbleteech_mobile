@@ -1,10 +1,13 @@
 package ffc.app.bubbletech.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -22,6 +25,7 @@ import ffc.app.bubbletech.model.Post
 import ffc.app.bubbletech.ui.theme.BubbleTechTheme
 import ffc.app.bubbletech.ui.theme.CardBlue
 import ffc.app.bubbletech.ui.theme.LightGrayText
+import ffc.app.bubbletech.ui.theme.SecondaryBlue
 
 @Composable
 fun PostCard(post: Post){
@@ -35,6 +39,22 @@ fun PostCard(post: Post){
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = CardBlue)
     ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(180.dp)
+                .background(SecondaryBlue)
+        ) {
+            Text(
+                text = post.category,
+                color = Color.White,
+                style = MaterialTheme.typography.labelMedium,
+                modifier = Modifier
+                    .padding(12.dp)
+                    .background(CardBlue.copy(alpha = 0.8f),RoundedCornerShape(50))
+                    .padding(horizontal = 12.dp, vertical = 4.dp)
+            )
+        }
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
                 text = post.title,
