@@ -12,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import ffc.app.bubbletech.components.BottomNavigationBar
 import ffc.app.bubbletech.components.CategoryChips
 import ffc.app.bubbletech.components.PostCard
 import ffc.app.bubbletech.data.FakeRepository
@@ -21,8 +22,8 @@ import ffc.app.bubbletech.ui.theme.BubbleTechTheme
 @Composable
 fun HomeScreen(posts: List<Post>) {
     var selectedCategory by remember { mutableStateOf("Hot") }
+    var selectedTab by remember { mutableStateOf("Home") }
 
-    // "Hot" mostra todos os posts; as outras categorias filtram a lista
     val visiblePosts = if (selectedCategory == "Hot") {
         posts
     } else {
@@ -36,6 +37,12 @@ fun HomeScreen(posts: List<Post>) {
                 categories = listOf("Hot", "IA", "Games", "Desenvolvimento", "Mercado"),
                 selected = selectedCategory,
                 onSelect = { category -> selectedCategory = category }
+            )
+        },
+        bottomBar = {
+            BottomNavigationBar(
+                selected = selectedTab,
+                onSelect = { tab -> selectedTab = tab }
             )
         }
     ) { innerPadding ->
