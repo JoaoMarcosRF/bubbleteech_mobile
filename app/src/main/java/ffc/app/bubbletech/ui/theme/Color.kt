@@ -11,6 +11,9 @@ val SecondaryBlue  = Color(0xFF0033A0)
 
 val CardBlue = Color(0xFF001445)
 
+val NavBlue = Color(0xFF001C5F)
+val NavHighlightBlue = Color(0xFF002579)
+
 val LightBlue = Color(0xFF3B82F6)
 val GrayBackground = Color(0XFFF4F5F7)
 
