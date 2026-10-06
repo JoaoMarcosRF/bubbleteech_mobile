@@ -4,8 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ffc.app.bubbletech.ui.theme.BackgroundBlue
 import ffc.app.bubbletech.ui.theme.BubbleTechTheme
 import ffc.app.bubbletech.ui.theme.SecondaryBlue
 
@@ -28,7 +29,10 @@ fun CategoryChips(
     onSelect: (String) -> Unit
 ) {
     LazyRow(
-        modifier = Modifier.statusBarsPadding(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(BackgroundBlue)
+            .statusBarsPadding(),
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
