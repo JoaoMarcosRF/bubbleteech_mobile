@@ -21,6 +21,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import ffc.app.bubbletech.R
+import ffc.app.bubbletech.data.FakeRepository
+import ffc.app.bubbletech.screens.HomeScreen
 
 import ffc.app.bubbletech.screens.LoginScreen
 import ffc.app.bubbletech.ui.theme.BackgroundBlue
@@ -46,10 +48,16 @@ fun AppNavigation() {
                 SplashScreen(navController = navController)
             }
 
+            composable("home_screen") {
+                HomeScreen(
+                    posts = FakeRepository().getPosts()
+                )
+            }
+
             composable("login"){
                 LoginScreen(
                     onLogin = {
-                        navController.navigate("home") {
+                        navController.navigate("home_screen") {
 
                             popUpTo("login") {
                                 inclusive = true

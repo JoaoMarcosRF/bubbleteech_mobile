@@ -294,7 +294,9 @@ fun LoginScreen(
                     }
 
                     Button(
-                        onClick = {print("Hey")},
+                        onClick = {
+                            onLogin()
+                        },
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = SecondaryBlue,
