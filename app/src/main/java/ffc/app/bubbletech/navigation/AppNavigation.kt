@@ -56,7 +56,7 @@ fun AppNavigation() {
             }
 
             composable(route = "register_screen") {
-                RegisterScreen {}
+                RegisterScreen(){}
             }
 
             composable("login"){
