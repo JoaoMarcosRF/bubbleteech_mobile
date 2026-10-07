@@ -117,6 +117,18 @@ fun PostDetailScreen(post: Post){
 
             Spacer(modifier = Modifier.height(16.dp))
             HorizontalDivider(color = ExtraLightGray)
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Texto da notícia: por enquanto, o resumo de cada notícia do post vira um parágrafo (dado mockado)
+            post.news.forEach { news ->
+                Text(
+                    text = news.summary,
+                    color = DarkText,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+            }
         }
     }
 }
