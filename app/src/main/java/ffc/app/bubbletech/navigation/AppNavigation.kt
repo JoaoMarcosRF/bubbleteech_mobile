@@ -25,6 +25,7 @@ import ffc.app.bubbletech.data.FakeRepository
 import ffc.app.bubbletech.screens.HomeScreen
 
 import ffc.app.bubbletech.screens.LoginScreen
+import ffc.app.bubbletech.screens.RegisterScreen
 import ffc.app.bubbletech.ui.theme.BackgroundBlue
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
@@ -52,6 +53,10 @@ fun AppNavigation() {
                 HomeScreen(
                     posts = FakeRepository().getPosts()
                 )
+            }
+
+            composable(route = "register_screen") {
+                RegisterScreen {}
             }
 
             composable("login"){
