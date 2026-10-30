@@ -23,6 +23,7 @@ import androidx.navigation.compose.rememberNavController
 import ffc.app.bubbletech.R
 import ffc.app.bubbletech.data.FakeRepository
 import ffc.app.bubbletech.screens.HomeScreen
+import ffc.app.bubbletech.screens.PostDetailScreen
 
 import ffc.app.bubbletech.screens.LoginScreen
 import ffc.app.bubbletech.screens.RegisterScreen
@@ -42,7 +43,7 @@ fun AppNavigation() {
     ) {
         NavHost(
             navController = navController,
-            startDestination = "splash_screen"
+            startDestination = "home_screen"
         ) {
 
             composable("splash_screen") {
@@ -51,8 +52,20 @@ fun AppNavigation() {
 
             composable("home_screen") {
                 HomeScreen(
-                    posts = FakeRepository().getPosts()
+                    posts = FakeRepository().getPosts(),
+                    onPostClick = { post ->
+                        navController.navigate("post_detail/${post.id}")
+                    }
                 )
+            }
+
+            composable("post_detail/{postId}") { backStackEntry ->
+                val postId = backStackEntry.arguments?.getString("postId")?.toIntOrNull()
+                val post = FakeRepository().getPosts().find { it.id == postId }
+
+                if (post != null) {
+                    PostDetailScreen(post = post)
+                }
             }
 
             composable(route = "register_screen") {

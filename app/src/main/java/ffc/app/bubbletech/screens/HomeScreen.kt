@@ -20,7 +20,10 @@ import ffc.app.bubbletech.ui.theme.BackgroundBlue
 import ffc.app.bubbletech.ui.theme.BubbleTechTheme
 
 @Composable
-fun HomeScreen(posts: List<Post>) {
+fun HomeScreen(
+    posts: List<Post>,
+    onPostClick: (Post) -> Unit = {}
+) {
     var selectedCategory by remember { mutableStateOf("Hot") }
     var selectedTab by remember { mutableStateOf("Home") }
 
@@ -51,7 +54,10 @@ fun HomeScreen(posts: List<Post>) {
             contentPadding = innerPadding
         ) {
             items(visiblePosts) { post ->
-                PostCard(post = post)
+                PostCard(
+                    post = post,
+                    onClick = { onPostClick(post) }
+                )
             }
         }
     }
