@@ -1,11 +1,11 @@
 package ffc.app.bubbletech.network
 
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import kotlinx.coroutines.runBlocking
 
 object ApiClient {
     private const val BASE_URL = "http://127.0.0.1:8080/"
@@ -14,18 +14,15 @@ object ApiClient {
         .addInterceptor { chain ->
             val user = FirebaseAuth.getInstance().currentUser
             val token = user?.let {
-                try {
-                    runBlocking { it.getIdToken(false).await().token }
-                } catch (e: Exception) {
-                    null
-                }
-            }
+                runBlocking { it.getIdToken(false).await().token }
+            } ?: throw IllegalStateException("Usuário não autenticado")
 
-            val requestBuilder = chain.request().newBuilder()
-            if (!token.isNullOrEmpty()) {
-                requestBuilder.header("Authorization", "Bearer $token")
-            }
-            chain.proceed(requestBuilder.build())
+            val request = chain.request()
+                .newBuilder()
+                .header("Authorization", "Bearer $token")
+                .build()
+
+            chain.proceed(request)
         }
         .build()
 

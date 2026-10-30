@@ -1,9 +1,10 @@
 package ffc.app.bubbletech.components
 
-import androidx.compose.foundation.Image
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,29 +17,28 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.ChatBubbleOutline
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
-import ffc.app.bubbletech.R
-import ffc.app.bubbletech.data.FakeRepository
-import ffc.app.bubbletech.model.Post
+import coil.compose.AsyncImage
+import ffc.app.bubbletech.model.NewsArticle
 import ffc.app.bubbletech.ui.theme.BubbleTechTheme
 import ffc.app.bubbletech.ui.theme.CardBlue
 import ffc.app.bubbletech.ui.theme.LightGrayText
@@ -46,11 +46,10 @@ import ffc.app.bubbletech.ui.theme.SecondaryBlue
 
 @Composable
 fun PostCard(
-    post: Post,
+    post: NewsArticle,
     onClick: () -> Unit = {}
 ){
-    val firstNews = post.news.first()
-    val extraSources = post.news.size - 1
+    val context = LocalContext.current
 
     Card(
         modifier = Modifier
@@ -66,15 +65,15 @@ fun PostCard(
                 .height(180.dp)
                 .background(SecondaryBlue)
         ) {
-            Image(
-                painter = painterResource(R.drawable.transparent_icon),
-                contentDescription = null,
+            AsyncImage(
+                model = post.imageUrl,
+                contentDescription = post.title,
                 modifier = Modifier.matchParentSize(),
                 contentScale = ContentScale.Crop
             )
 
             Text(
-                text = post.category,
+                text = post.categories.firstOrNull() ?: "Notícia",
                 color = Color.White,
                 style = MaterialTheme.typography.labelMedium,
                 modifier = Modifier
@@ -96,25 +95,6 @@ fun PostCard(
                     modifier = Modifier.weight(1f)
                 )
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.AccessTime,
-                        contentDescription = null,
-                        modifier = Modifier.size(12.dp),
-                        tint = Color.LightGray
-                    )
-
-                    Text(
-                        text = "6 min",
-                        fontSize = 3.em,
-                        color = Color.LightGray,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Normal
-                    )
-                }
             }
             Spacer(modifier = Modifier.height(8.dp))
             Row(
@@ -128,7 +108,7 @@ fun PostCard(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = firstNews.source.take(1).uppercase(),
+                        text = post.source.take(1).uppercase(),
                         style = MaterialTheme.typography.labelMedium,
                         color = Color.Black,
                         fontWeight = FontWeight.Bold
@@ -136,7 +116,7 @@ fun PostCard(
                 }
 
                 Text(
-                    text = if (extraSources > 0) "${firstNews.source} +$extraSources" else firstNews.source,
+                    text = post.source,
                     color = Color.White,
                     style = MaterialTheme.typography.labelLarge
                 )
@@ -144,7 +124,7 @@ fun PostCard(
 
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = firstNews.summary,
+                text = post.description,
                 color = LightGrayText,
                 style = MaterialTheme.typography.bodyMedium,
                 maxLines = 4,
@@ -159,37 +139,76 @@ fun PostCard(
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.ChatBubbleOutline,
-                        contentDescription = null,
-                        modifier = Modifier.size(12.dp),
-                        tint = Color.LightGray
-                    )
-
-                    Text(
-                        text = "24",
-                        fontSize = 3.em,
-                        color = Color.LightGray,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Normal
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.FavoriteBorder,
+                            contentDescription = "Curtidas",
+                            modifier = Modifier.size(14.dp),
+                            tint = Color.LightGray
+                        )
+                        Text(
+                            text = "${post.likesCount}",
+                            fontSize = 3.em,
+                            color = Color.LightGray,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Normal
+                        )
+                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ChatBubbleOutline,
+                            contentDescription = "Comentários",
+                            modifier = Modifier.size(14.dp),
+                            tint = Color.LightGray
+                        )
+                        Text(
+                            text = "${post.commentsCount}",
+                            fontSize = 3.em,
+                            color = Color.LightGray,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Normal
+                        )
+                    }
                 }
 
-                Icon(
-                    imageVector = Icons.Default.Share,
-                    contentDescription = "Compartilhar",
-                    modifier = Modifier
-                        .size(17.dp)
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null
-                        ) {
-                            println("Compartilhar")
-                        },
-                    tint = Color.LightGray
-                )
+                IconButton(
+                    onClick = {
+                        if (post.url.isBlank()) {
+                            Toast.makeText(
+                                context,
+                                "Link da notícia indisponível",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            try {
+                                context.startActivity(
+                                    Intent(Intent.ACTION_VIEW, Uri.parse(post.url))
+                                )
+                            } catch (e: ActivityNotFoundException) {
+                                Toast.makeText(
+                                    context,
+                                    "Não foi possível abrir o link",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    },
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Share,
+                        contentDescription = "Abrir notícia completa",
+                        tint = Color.LightGray
+                    )
+                }
             }
         }
     }
@@ -199,6 +218,20 @@ fun PostCard(
 @Composable
 fun PostCardPreview(){
     BubbleTechTheme {
-        PostCard(post = FakeRepository().getPosts().first())
+        PostCard(
+            post = NewsArticle(
+                id = "preview",
+                title = "Notícia de exemplo",
+                description = "Resumo da notícia",
+                content = "Conteúdo da notícia",
+                url = "",
+                imageUrl = null,
+                source = "BubbleTech",
+                categories = listOf("IA"),
+                likesCount = 0,
+                commentsCount = 0,
+                publishedAt = ""
+            )
+        )
     }
 }

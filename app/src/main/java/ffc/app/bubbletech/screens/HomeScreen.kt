@@ -2,35 +2,42 @@ package ffc.app.bubbletech.screens
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.runtime.Composable
-import ffc.app.bubbletech.model.Post
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import ffc.app.bubbletech.components.BottomNavigationBar
 import ffc.app.bubbletech.components.CategoryChips
 import ffc.app.bubbletech.components.PostCard
-import ffc.app.bubbletech.data.FakeRepository
+import ffc.app.bubbletech.model.NewsArticle
 import ffc.app.bubbletech.ui.theme.BackgroundBlue
 import ffc.app.bubbletech.ui.theme.BubbleTechTheme
 
 @Composable
 fun HomeScreen(
-    posts: List<Post>,
-    onPostClick: (Post) -> Unit = {}
+    onPostClick: (NewsArticle) -> Unit = {},
+    newsViewModel: NewsViewModel = viewModel()
 ) {
+    val state by newsViewModel.state.collectAsStateWithLifecycle()
     var selectedCategory by remember { mutableStateOf("Hot") }
     var selectedTab by remember { mutableStateOf("Home") }
 
-    val visiblePosts = if (selectedCategory == "Hot") {
-        posts
-    } else {
-        posts.filter { post -> post.category == selectedCategory }
+    LaunchedEffect(selectedCategory) {
+        newsViewModel.loadNews(
+            category = selectedCategory
+                .takeUnless { it == "Hot" }
+                ?.lowercase()
+        )
     }
 
     Scaffold(
@@ -53,11 +60,26 @@ fun HomeScreen(
             modifier = Modifier.fillMaxSize(),
             contentPadding = innerPadding
         ) {
-            items(visiblePosts) { post ->
+            itemsIndexed(state.items) { index, article ->
                 PostCard(
-                    post = post,
-                    onClick = { onPostClick(post) }
+                    post = article,
+                    onClick = { onPostClick(article) }
                 )
+                if (index == state.items.lastIndex && state.nextCursor != null) {
+                    LaunchedEffect(state.nextCursor) {
+                        newsViewModel.loadNextPage()
+                    }
+                }
+            }
+            if (state.loading) {
+                item {
+                    CircularProgressIndicator()
+                }
+            }
+            state.error?.let { error ->
+                item {
+                    Text(error)
+                }
             }
         }
     }
@@ -67,6 +89,6 @@ fun HomeScreen(
 @Composable
 fun HomeScreenPreview() {
     BubbleTechTheme {
-        HomeScreen(posts = FakeRepository().getPosts())
+        HomeScreen()
     }
 }
