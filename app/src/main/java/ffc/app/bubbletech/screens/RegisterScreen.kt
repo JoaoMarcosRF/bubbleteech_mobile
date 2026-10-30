@@ -11,6 +11,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,6 +42,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,6 +54,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -61,7 +65,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.viewmodel.compose.viewModel
 import ffc.app.bubbletech.R
+import ffc.app.bubbletech.auth.AuthViewModel
 import ffc.app.bubbletech.ui.theme.BubbleTechTheme
 import ffc.app.bubbletech.ui.theme.ExtraLightGray
 import ffc.app.bubbletech.ui.theme.GrayBackground
@@ -72,7 +78,9 @@ import ffc.app.bubbletech.ui.theme.SecondaryBlue
 // Depois tem quebrar essa tela em pequenos modulos!
 @Composable
 fun RegisterScreen(
-    onLogin: () -> Unit
+    onLogin: () -> Unit,
+    onBackToLogin: () -> Unit,
+    viewModel: AuthViewModel = viewModel()
 ) {
     var name by rememberSaveable { mutableStateOf("") }
     var email by rememberSaveable { mutableStateOf("") }
@@ -93,6 +101,12 @@ fun RegisterScreen(
         MutableTransitionState(false).apply {
             targetState = true
         }
+    }
+    val state by viewModel.state.collectAsState()
+    val context = LocalContext.current
+
+    LaunchedEffect(state.profile) {
+        if (state.profile != null) onLogin()
     }
 
     Box(
@@ -399,11 +413,14 @@ fun RegisterScreen(
                                 shape = RoundedCornerShape(12.dp)
                             )
                     )
-
+                    state.error?.let {
+                        Text(it, color = Color.Red, fontSize = 13.sp)
+                    }
                     Button(
                         onClick = {
-                            onLogin()
+                            viewModel.register(name, email, password, confirmPassword)
                         },
+                        enabled = !state.loading,
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = SecondaryBlue,
@@ -446,7 +463,7 @@ fun RegisterScreen(
 
                     OutlinedButton(
                         onClick = {
-                            print("Hello")
+                            viewModel.loginWithGoogle(context)
                         },
                         shape = RoundedCornerShape(16.dp),
                         border = BorderStroke(1.dp, ExtraLightGray),
@@ -493,7 +510,8 @@ fun RegisterScreen(
                             "Entrar",
                             color = LightBlue,
                             fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.clickable {onBackToLogin()}
                         ) // Mudar para TextButton depois, deixei assim pq n sei fazer ainda.
                     }
                 }
@@ -512,15 +530,5 @@ fun RegisterScreen(
                 )
             }
         }
-    }
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFF00174E, showSystemUi = true)
-@Composable
-fun RegisterScreenPreview() {
-    BubbleTechTheme {
-        RegisterScreen(onLogin = {
-            print("Olá")
-        })
     }
 }

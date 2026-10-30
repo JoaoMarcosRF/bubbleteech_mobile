@@ -56,18 +56,31 @@ fun AppNavigation() {
             }
 
             composable(route = "register_screen") {
-                RegisterScreen {}
+                RegisterScreen(
+                    onLogin = {
+                        navController.navigate("home_screen") {
+                            popUpTo("login") {
+                                inclusive = true
+                            }
+                        }
+                    },
+                    onBackToLogin = {
+                        navController.popBackStack()
+                    }
+                )
             }
 
             composable("login"){
                 LoginScreen(
                     onLogin = {
                         navController.navigate("home_screen") {
-
                             popUpTo("login") {
                                 inclusive = true
                             }
                         }
+                    },
+                    onRegisterClick = {
+                        navController.navigate("register_screen")
                     }
                 )
             }
