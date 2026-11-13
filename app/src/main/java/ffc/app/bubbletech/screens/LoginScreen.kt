@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -59,23 +60,36 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.lifecycle.viewmodel.compose.viewModel
+import ffc.app.bubbletech.auth.AuthViewModel
 import ffc.app.bubbletech.ui.theme.LightBlue
 import ffc.app.bubbletech.ui.theme.SecondaryBlue
 
 // Depois tem quebrar essa tela em pequenos modulos!
 @Composable
 fun LoginScreen(
-    onLogin: () -> Unit
+    onLogin: () -> Unit,
+    onRegisterClick: () -> Unit,
+    viewModel: AuthViewModel = viewModel()
 ) {
     var email by rememberSaveable { mutableStateOf("") }
 
     var password by remember { mutableStateOf("") }
     var isPasswordVisible by remember { mutableStateOf(false) }
 
+    val state by viewModel.state.collectAsState()
+    val context = LocalContext.current
+
+    LaunchedEffect(state.profile) {
+        if (state.profile != null) onLogin()
+    }
     val isVisible = remember {
         MutableTransitionState(false).apply {
             targetState = true
@@ -292,11 +306,17 @@ fun LoginScreen(
                             modifier = Modifier.fillMaxWidth()
                         ) // Mudar para TextButton depois, deixei assim pq n sei fazer ainda.
                     }
-
+                    state.error?.let {
+                        Text(it, color = Color.Red, fontSize = 13.sp)
+                    }
+                    state.message?.let {
+                        Text(it, color = LightBlue, fontSize = 13.sp)
+                    }
                     Button(
                         onClick = {
-                            onLogin()
+                            viewModel.login(email, password)
                         },
+                        enabled = !state.loading,
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = SecondaryBlue,
@@ -339,7 +359,7 @@ fun LoginScreen(
 
                     OutlinedButton(
                         onClick = {
-                            print("Hello")
+                            viewModel.loginWithGoogle(context)
                         },
                         shape = RoundedCornerShape(16.dp),
                         border = BorderStroke(1.dp, ExtraLightGray),
@@ -386,7 +406,8 @@ fun LoginScreen(
                             "Criar conta",
                             color = LightBlue,
                             fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.clickable { onRegisterClick() }
                         ) // Mudar para TextButton depois, deixei assim pq n sei fazer ainda.
                     }
                 }

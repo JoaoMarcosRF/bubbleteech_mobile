@@ -21,8 +21,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import ffc.app.bubbletech.R
-import ffc.app.bubbletech.data.FakeRepository
 import ffc.app.bubbletech.screens.HomeScreen
+import ffc.app.bubbletech.screens.PostDetailScreen
 
 import ffc.app.bubbletech.screens.LoginScreen
 import ffc.app.bubbletech.screens.RegisterScreen
@@ -51,23 +51,45 @@ fun AppNavigation() {
 
             composable("home_screen") {
                 HomeScreen(
-                    posts = FakeRepository().getPosts()
+                    onPostClick = { article ->
+                        navController.navigate("post_detail/${article.id}")
+                    }
                 )
             }
 
+            composable("post_detail/{newsId}") { backStackEntry ->
+                val newsId = backStackEntry.arguments?.getString("newsId")
+                if (newsId != null) {
+                    PostDetailScreen(articleId = newsId)
+                }
+            }
+
             composable(route = "register_screen") {
-                RegisterScreen(){}
+                RegisterScreen(
+                    onLogin = {
+                        navController.navigate("home_screen") {
+                            popUpTo("login") {
+                                inclusive = true
+                            }
+                        }
+                    },
+                    onBackToLogin = {
+                        navController.popBackStack()
+                    }
+                )
             }
 
             composable("login"){
                 LoginScreen(
                     onLogin = {
                         navController.navigate("home_screen") {
-
                             popUpTo("login") {
                                 inclusive = true
                             }
                         }
+                    },
+                    onRegisterClick = {
+                        navController.navigate("register_screen")
                     }
                 )
             }
