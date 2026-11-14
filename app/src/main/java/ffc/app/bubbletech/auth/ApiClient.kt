@@ -8,7 +8,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object ApiClient {
-    private const val BASE_URL = "http://127.0.0.1:8080/"
+    private const val BASE_URL = "http://localhost:8081/"
 
     private val http = OkHttpClient.Builder()
         .addInterceptor { chain ->

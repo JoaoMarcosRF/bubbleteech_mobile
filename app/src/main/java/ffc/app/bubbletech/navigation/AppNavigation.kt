@@ -26,7 +26,6 @@ import ffc.app.bubbletech.screens.PostDetailScreen
 
 import ffc.app.bubbletech.screens.LoginScreen
 import ffc.app.bubbletech.screens.RegisterScreen
-import ffc.app.bubbletech.ui.theme.BackgroundBlue
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -38,7 +37,7 @@ fun AppNavigation() {
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundBlue)
+            .background(Color.White)
     ) {
         NavHost(
             navController = navController,

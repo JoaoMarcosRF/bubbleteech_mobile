@@ -69,6 +69,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ffc.app.bubbletech.auth.AuthViewModel
+import ffc.app.bubbletech.ui.theme.BackgroundBlue
 import ffc.app.bubbletech.ui.theme.LightBlue
 import ffc.app.bubbletech.ui.theme.SecondaryBlue
 
@@ -104,7 +105,18 @@ fun LoginScreen(
 
     Box(
         contentAlignment = Alignment.BottomCenter,
-        modifier = Modifier.fillMaxSize().zIndex(1f)
+        modifier = Modifier
+            .fillMaxSize()
+            .zIndex(1f)
+            .background(
+                color = BackgroundBlue,
+                shape = RoundedCornerShape(
+                    40.dp,
+                    40.dp,
+                    0.dp,
+                    0.dp
+                )
+        )
     ) {
         AnimatedVisibility(
             visibleState = isHelloVisible,
