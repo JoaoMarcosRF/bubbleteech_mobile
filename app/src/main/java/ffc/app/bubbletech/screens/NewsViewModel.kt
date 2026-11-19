@@ -4,10 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ffc.app.bubbletech.data.NewsRepository
 import ffc.app.bubbletech.model.NewsArticle
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlin.coroutines.cancellation.CancellationException
 
 data class NewsListUiState(
     val items: List<NewsArticle> = emptyList(),
@@ -25,13 +27,14 @@ class NewsViewModel(
 
     private var category: String? = null
     private var search: String? = null
+    private var loadJob: Job? = null
 
-    fun loadNews(category: String? = this.category, search: String? = this.search) {
+    fun loadNews(category: String?, search: String?) {
         this.category = category
         this.search = search
-        if (_state.value.loading) return
 
-        viewModelScope.launch {
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
             _state.value = _state.value.copy(loading = true, error = null)
             try {
                 val response = repository.getNews(category, search, null)
@@ -39,6 +42,8 @@ class NewsViewModel(
                     items = response.items,
                     nextCursor = response.nextCursor
                 )
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 _state.value = _state.value.copy(
                     loading = false,
@@ -52,7 +57,7 @@ class NewsViewModel(
         val cursor = _state.value.nextCursor ?: return
         if (_state.value.loading) return
 
-        viewModelScope.launch {
+        loadJob = viewModelScope.launch {
             _state.value = _state.value.copy(loading = true, error = null)
             try {
                 val response = repository.getNews(category, search, cursor)
@@ -61,6 +66,8 @@ class NewsViewModel(
                     nextCursor = response.nextCursor,
                     loading = false
                 )
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 _state.value = _state.value.copy(
                     loading = false,

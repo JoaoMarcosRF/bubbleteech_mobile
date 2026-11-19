@@ -1,5 +1,7 @@
 package ffc.app.bubbletech.screens
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -12,16 +14,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.firebase.auth.FirebaseAuth
 import ffc.app.bubbletech.components.BottomNavigationBar
 import ffc.app.bubbletech.components.CategoryChips
-import ffc.app.bubbletech.components.PostCard
+import ffc.app.bubbletech.components.PostCardAlternative
+import ffc.app.bubbletech.components.TopSearchBar
 import ffc.app.bubbletech.model.NewsArticle
-import ffc.app.bubbletech.ui.theme.BackgroundBlue
+import ffc.app.bubbletech.ui.theme.Background
 import ffc.app.bubbletech.ui.theme.BubbleTechTheme
+import kotlinx.coroutines.delay
 
 @Composable
 fun HomeScreen(
@@ -30,24 +38,41 @@ fun HomeScreen(
 ) {
     val state by newsViewModel.state.collectAsStateWithLifecycle()
     var selectedCategory by remember { mutableStateOf("Hot") }
-    var selectedTab by remember { mutableStateOf("Home") }
+    var selectedTab by remember { mutableStateOf("Feed") }
+    var searchQuery by remember { mutableStateOf("") }
 
-    LaunchedEffect(selectedCategory) {
+    val currentUser = remember { FirebaseAuth.getInstance().currentUser }
+    val userInitial = remember(currentUser) {
+        currentUser?.displayName?.take(1)?.uppercase()
+            ?: currentUser?.email?.take(1)?.uppercase()
+            ?: "E"
+    }
+
+    LaunchedEffect(selectedCategory, searchQuery) {
+        if (searchQuery.isNotBlank()) delay(400)
         newsViewModel.loadNews(
             category = selectedCategory
                 .takeUnless { it == "Hot" }
-                ?.lowercase()
+                ?.lowercase(),
+            search = searchQuery.trim().ifBlank { null }
         )
     }
 
     Scaffold(
-        containerColor = BackgroundBlue,
+        containerColor = Background,
         topBar = {
-            CategoryChips(
-                categories = listOf("Hot", "IA", "Games", "Desenvolvimento", "Mercado"),
-                selected = selectedCategory,
-                onSelect = { category -> selectedCategory = category }
-            )
+            Column {
+                TopSearchBar(
+                    query = searchQuery,
+                    onQueryChange = { searchQuery = it },
+                    userInitial = userInitial
+                )
+                CategoryChips(
+                    categories = listOf("Hot", "IA", "Games", "Desenvolvimento", "Mercado"),
+                    selected = selectedCategory,
+                    onSelect = { category -> selectedCategory = category }
+                )
+            }
         },
         bottomBar = {
             BottomNavigationBar(
@@ -61,7 +86,7 @@ fun HomeScreen(
             contentPadding = innerPadding
         ) {
             itemsIndexed(state.items) { index, article ->
-                PostCard(
+                PostCardAlternative(
                     post = article,
                     onClick = { onPostClick(article) }
                 )
@@ -79,6 +104,16 @@ fun HomeScreen(
             state.error?.let { error ->
                 item {
                     Text(error)
+                }
+            }
+            if (!state.loading && state.items.isEmpty() && state.error == null) {
+                item {
+                    Box(
+                        modifier = Modifier.fillParentMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("Nenhuma notícia encontrada", color = Color.Blue)
+                    }
                 }
             }
         }

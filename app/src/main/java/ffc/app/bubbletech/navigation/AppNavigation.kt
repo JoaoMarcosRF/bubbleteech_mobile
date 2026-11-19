@@ -38,7 +38,7 @@ fun AppNavigation() {
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundBlue)
+            .background(Color.White)
     ) {
         NavHost(
             navController = navController,
