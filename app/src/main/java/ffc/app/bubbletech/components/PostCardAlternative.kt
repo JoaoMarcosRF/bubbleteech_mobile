@@ -21,6 +21,7 @@ import androidx.compose.material.icons.automirrored.filled.CallMade
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.outlined.ArrowCircleUp
 import androidx.compose.material.icons.outlined.Bookmark
+import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -28,6 +29,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -48,9 +50,12 @@ import ffc.app.bubbletech.ui.theme.CardBlue
 @Composable
 fun PostCardAlternative(
     post: NewsArticle,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
+    isSaved: Boolean = false,
+    onToggleSave: (() -> Unit)? = null
 ) {
     val context = LocalContext.current
+    val readTime = remember(post.id) { (6..18).random() }
 
     Card(
         modifier = Modifier
@@ -111,7 +116,7 @@ fun PostCardAlternative(
                             modifier = Modifier.size(18.dp)
                         )
                         Text(
-                            text = "${(6..18).random()} min",
+                            text = "$readTime min",
                             color = Color.White,
                             style = MaterialTheme.typography.labelMedium,
                             fontSize = 13.sp
@@ -179,6 +184,17 @@ fun PostCardAlternative(
                             modifier = Modifier.size(22.dp)
                         )
                         */
+
+                        if (onToggleSave != null) {
+                            Icon(
+                                imageVector = if (isSaved) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
+                                contentDescription = if (isSaved) "Remover dos salvos" else "Salvar",
+                                tint = Color.White,
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .clickable { onToggleSave() }
+                            )
+                        }
 
                         Box(
                             modifier = Modifier

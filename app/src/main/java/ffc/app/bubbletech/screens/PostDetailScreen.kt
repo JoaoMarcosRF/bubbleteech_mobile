@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -53,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import ffc.app.bubbletech.components.BackButton
 import ffc.app.bubbletech.model.Comment
 import ffc.app.bubbletech.model.NewsArticle
 import ffc.app.bubbletech.ui.theme.BubbleTechTheme
@@ -80,6 +82,7 @@ private fun formatDate(date: String): String {
 @Composable
 fun PostDetailScreen(
     articleId: String,
+    onBack: () -> Unit,
     postDetailViewModel: PostDetailViewModel = viewModel()
 ) {
     val state by postDetailViewModel.state.collectAsStateWithLifecycle()
@@ -88,31 +91,36 @@ fun PostDetailScreen(
         postDetailViewModel.load(articleId)
     }
 
-    if (state.loading) {
-        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("Carregando...", color = DarkText)
-        }
-        return
-    }
+    val article = state.article
 
-    val article = state.article ?: run {
-        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text(state.error ?: "Notícia não encontrada", color = DarkText)
+    Box(modifier = Modifier.fillMaxSize()) {
+        when {
+            state.loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("Carregando...", color = DarkText)
+            }
+            article == null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(state.error ?: "Notícia não encontrada", color = DarkText)
+            }
+            else -> PostDetailContent(
+                article = article,
+                comments = state.comments,
+                liked = state.liked,
+                commentError = state.commentError,
+                onLikeClick = postDetailViewModel::toggleLike,
+                onAddComment = postDetailViewModel::addComment,
+                onEditComment = postDetailViewModel::editComment,
+                onDeleteComment = postDetailViewModel::deleteComment,
+                canEditComment = postDetailViewModel::isCurrentUser
+            )
         }
-        return
-    }
 
-    PostDetailContent(
-        article = article,
-        comments = state.comments,
-        liked = state.liked,
-        commentError = state.commentError,
-        onLikeClick = postDetailViewModel::toggleLike,
-        onAddComment = postDetailViewModel::addComment,
-        onEditComment = postDetailViewModel::editComment,
-        onDeleteComment = postDetailViewModel::deleteComment,
-        canEditComment = postDetailViewModel::isCurrentUser
-    )
+        BackButton(
+            onClick = onBack,
+            modifier = Modifier
+                .statusBarsPadding()
+                .padding(16.dp)
+        )
+    }
 }
 
 @Composable

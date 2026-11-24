@@ -23,6 +23,9 @@ import androidx.navigation.compose.rememberNavController
 import ffc.app.bubbletech.R
 import ffc.app.bubbletech.screens.HomeScreen
 import ffc.app.bubbletech.screens.PostDetailScreen
+import ffc.app.bubbletech.screens.ProfileScreen
+import ffc.app.bubbletech.auth.AuthRepository
+import ffc.app.bubbletech.data.LocalNewsStore
 
 import ffc.app.bubbletech.screens.LoginScreen
 import ffc.app.bubbletech.screens.RegisterScreen
@@ -53,6 +56,24 @@ fun AppNavigation() {
                 HomeScreen(
                     onPostClick = { article ->
                         navController.navigate("post_detail/${article.id}")
+                    },
+                    onProfileClick = {
+                        navController.navigate("profile")
+                    }
+                )
+            }
+
+            composable("profile") {
+                ProfileScreen(
+                    onBack = { navController.popBackStack() },
+                    onLogout = {
+                        AuthRepository().logout()
+                        LocalNewsStore.clear()
+                        navController.navigate("login") {
+                            popUpTo(navController.graph.id) {
+                                inclusive = true
+                            }
+                        }
                     }
                 )
             }
@@ -60,7 +81,10 @@ fun AppNavigation() {
             composable("post_detail/{newsId}") { backStackEntry ->
                 val newsId = backStackEntry.arguments?.getString("newsId")
                 if (newsId != null) {
-                    PostDetailScreen(articleId = newsId)
+                    PostDetailScreen(
+                        articleId = newsId,
+                        onBack = { navController.popBackStack() }
+                    )
                 }
             }
 

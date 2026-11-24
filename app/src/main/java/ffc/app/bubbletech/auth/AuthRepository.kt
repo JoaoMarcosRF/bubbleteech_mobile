@@ -22,6 +22,10 @@ class AuthRepository(
         result.user?.getIdToken(true)?.await()
     }
 
+    fun logout() {
+        auth.signOut()
+    }
+
     suspend fun login(email: String, password: String) {
         val result = auth.signInWithEmailAndPassword(email, password).await()
         result.user?.getIdToken(true)?.await()
