@@ -1,5 +1,6 @@
 package ffc.app.bubbletech.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -61,7 +62,9 @@ fun HomeScreen(
     Scaffold(
         containerColor = Background,
         topBar = {
-            Column {
+            Column(
+                modifier = Modifier.background(Background)
+            ) {
                 TopSearchBar(
                     query = searchQuery,
                     onQueryChange = { searchQuery = it },
